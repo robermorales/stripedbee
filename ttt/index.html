@@ -1,0 +1,209 @@
+<script language="javascript" type="text/javascript">
+// TRES EN RAYA GRAFICO
+// por Roberto Morales Chaparro, rolet.iespana.es, robertomc_85@hotmail.com
+//
+
+//  27 de octubre de 2002,1ª version 8 de oct.
+//  v2.0 del tres en raya
+
+var tablero = new initArray(0,0,0,0,0,0,0,0,0);	//tablero del TTT, de la manera: 812,793,654
+var jug = 2						//1 la persona, 2 la maquina
+var ultima = 0;					//última casilla ocupada por la persona
+var tras = 0;					//para el algoritmo, nº de posiciones giradas desde el modelo
+var sepuede = true				//indica si la persona puede poner ficha o no
+var O="o.jpg"	//imagen O
+var X="x.jpg"	//imagen X
+var gan = 0					//si hay ganador y quién es: -1 tablas
+var turno = 0					//numero de circulos
+
+//posiciones donde han puesto circulos
+var cir = new initArray(undefined,undefined,undefined)
+
+//lista de lineas
+var pg = new initArray(8,1,2,7,9,3,6,5,4,8,9,4,6,9,2,8,7,6,1,9,5,2,3,4)
+
+//aqui esta codificado el algoritmo, descodificarlo... lleva su tiempo
+var d   = new initArray(3,3,3,3,3,3,3,4);
+var d8  = new initArray(2,1,5,0,3,7,6,0);
+var d81 = new initArray(6,6,6,6,6,3,6,6);
+var d82 = new initArray(5,5,5,5,7,5,5,5);
+var d825= new initArray(6,6,6,6,6,3,6,6);
+var d83 = new initArray(6,1,1,1,1,1,1,1);
+var d85 = new initArray(7,7,7,7,7,7,2,7);
+var d86 = new initArray(3,3,1,3,3,3,3,3);
+var d863= new initArray(5,5,5,5,2,5,5,5);
+var d87 = new initArray(5,5,5,5,2,5,5,5);
+var d1  = new initArray(7,7,7,7,7,7,4,7);
+var d17 = new initArray(2,8,2,2,2,2,2,2);
+
+salto = 0
+function ObtenSalto() {
+	//introducido por El Codigo
+	//si hay otras imagenes en la pagina HTML (a parte del tablero), las tiene en cuenta con esta variable
+	while ( document.images[salto].src.indexOf("c.jpg") == -1) {
+		salto++;
+	}
+}
+
+function flujo()
+{
+	//introducido por El Codigo
+	//si hay otras imagenes en la pagina HTML (a parte del tablero), las tiene en cuenta con esta variable
+	ObtenSalto()
+	//if(confirm('yo empiezo,\njugar con X <Aceptar>\njugar con O <Cancelar>')) jugarconX();
+	equis(9);
+}
+
+function jugarconX()
+{
+	a=X;
+	X=O;
+	O=a;
+}
+
+function equis(n)
+{
+	n += tras
+	if (n < 1) n += 8;
+	else if (n > 8 && turno) n -= 8	//lo del turno es que si es la primera equis
+					//puede poner en el centro (9). Si no seria la 1.
+	n%8;
+	tablero[n] = 2;
+	document.images[f(n)].src=X
+	switch (comprobar())
+	{
+		case 0: sepuede = true; break;
+		case 1: alert('Has perdido. Para reiniciar pulsa F5'); break;
+		case 2: alert('Tablas. Para reiniciar pulsa F5'); break;
+	}
+}
+
+function comprobar()
+{
+	suma=1;
+	for(i=0;i<8;i++,suma*=tablero[i])
+		{
+		if(tablero[pg[3*i+1]] * tablero[pg[3*i+2]] * tablero[pg[3*i+3]] == 8) return 1;
+		}
+	if (suma!=0) return 2;
+	return 0;
+}
+
+function f(n)
+{
+	var x = 1;
+	switch(n)
+		{
+		case 1: x = 3; break;
+		case 2: x = 5; break;
+		case 3: x = 15; break;
+		case 4: x = 25; break;
+		case 5: x = 23; break;
+		case 6: x = 21; break;
+		case 7: x = 11; break;
+		case 8: x = 1; break;
+		case 9: x = 13; break;
+	}
+
+	//modificado por El Codigo
+	//si hay otras imagenes en la pagina HTML (a parte del tablero), las tiene en cuenta con esta variable
+	//return x-1;
+	return x-1+salto;
+}
+
+function circulo(n,objeto)	//onClick de las imagenes, n es el nº en el tablero
+							//objeto es la imagen(this)
+{
+	if(!tablero[n] && sepuede)
+		{
+		tablero[n] = 1		//poner un circulo
+		sepuede = false		//desactivar los circulos hasta que la CPU ponga X
+		cambiarjugador();	//para que pueda poner una X
+		objeto.src = O;		//O es el string del nombre de la imagen O
+		ultima = n;
+		ultimabn();
+		for(i=1;cir[i]!=undefined;i++); cir[i]=ultima
+		turno++;
+		juegacpu();
+        }
+}
+
+function juegacpu()
+{
+	for(ins='d',i=1;cir[i]!=undefined&&cir[i+1]!=undefined;ins+=cir[i],i++);
+	ins+='['+cir[i]+']';
+	equis(eval(ins));
+}
+
+function ultimabn()		//ajusta el valor de ultima con respecto a tras
+{
+	if(turno == 0)
+	{
+		tras = ultima - ( ultima % 2 ? ultima % 2 : 0 )
+	}
+	ultima-=tras;
+	if (ultima<1) ultima+=8
+	return ultima;
+}
+
+function cambiarjugador() //1->2, 2->1
+{
+	jug=3-jug
+}
+
+
+function initArray()
+{
+	this.length = initArray.arguments.length
+	for (var i = 0; i < this.length; i++)
+	this[i+1] = initArray.arguments[i]
+}
+
+
+
+</script>
+
+<p>Juegas con círculos...</p>
+<table cellspacing="0" cellpadding="0" border="0" align="center">
+        <tr>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(8,this);"></td>
+                <td width="13"><img border="0" src="ver.jpg" width="13" height="30"></td>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(1,this);"></td>
+                <td width="13"><img border="0" src="ver.jpg" width="13" height="30"></td>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(2,this);"></td>
+        </tr>
+        <tr>
+                <td width="30"><img border="0" src="hor.jpg" width="30" height="13"></td>
+                <td width="13"><img border="0" src="esq.jpg" width="13" height="13"></td>
+                <td width="30"><img border="0" src="hor.jpg" width="30" height="13"></td>
+                <td width="13"><img border="0" src="esq.jpg" width="13" height="13"></td>
+                <td width="30"><img border="0" src="hor.jpg" width="30" height="13"></td>
+        </tr>
+        <tr>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(7,this);"></td>
+                <td width="13"><img border="0" src="ver.jpg" width="13" height="30"></td>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30"></td>
+                <td width="13"><img border="0" src="ver.jpg" width="13" height="30"></td>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(3,this);"></td>
+        </tr>
+        <tr>
+                <td width="30"><img border="0" src="hor.jpg" width="30" height="13"></td>
+                <td width="13"><img border="0" src="esq.jpg" width="13" height="13"></td>
+                <td width="30"><img border="0" src="hor.jpg" width="30" height="13"></td>
+                <td width="13"><img border="0" src="esq.jpg" width="13" height="13"></td>
+                <td width="30"><img border="0" src="hor.jpg" width="30" height="13"></td>
+        </tr>
+        <tr>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(6,this);"></td>
+                <td width="13"><img border="0" src="ver.jpg" width="13" height="30"></td>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(5,this);"></td>
+                <td width="13"><img border="0" src="ver.jpg" width="13" height="30"></td>
+                <td width="30"><img border="0" src="c.jpg" width="30" height="30" onClick="javascript:circulo(4,this);"></td>
+        </tr>
+</table>
+
+<script>flujo();</script>
+
+
+
+

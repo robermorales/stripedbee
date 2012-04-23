@@ -1,0 +1,510 @@
+<html><head><!-- emp: 19 de junio -->
+<title>ConeCta CuaTro, por Roberto Morales </title>
+<style>
+.c4{background:#000000}
+h1{background:black;border-bottom:3px ridge red;margin:0;padding:0;font-style:normal; font-variant:normal; font-weight:normal; font-size:40px}
+h4{background:black;border-bottom:3px ridge red;padding:0;font-style:normal; font-variant:normal; font-weight:normal; font-size:20px; margin-left:0; margin-right:0; margin-top:0; margin-bottom:10}
+a{cursor:hand;text-decoration:none;color:lime}
+a:hover{background:#11aa11;cursor:hand}
+td{font-size:16px;font weight:bold}</style>
+<script lang="JavaScript">
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                           //
+//      por Roberto Morales, ultimozar@hotmail.com, rolet.iespana.es                //
+//      estar: 19-06-02 finis: 20-06-02                              ZäR                     //
+//      nueva: 24-06-02 finis: 28-06-02                                                      //
+//                                                                                           //
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+var nombre,i,j,mensaje_alerta,jugador,ly,lx,ganador,puesta,tablero,haytablas
+var inicia='<br>1 jugador:[<a href=# onclick="iniciar(1);">azul</a>,'
+inicia+='<a href=# onclick="iniciar(2);">rojo</a>];'
+inicia+='2 jugadores:[<a href=# onclick="iniciar2(1);">azul</a>,'
+inicia+='<a href=# onclick="iniciar2(2);">rojo</a>]'
+var roja="roja.jpg",azul="azul.jpg",vacio="vacio.jpg"
+var troja="troja.jpg",tazul="tazul.jpg",tvacia="tvacia.jpg"
+
+//para la Ai
+var tp,columna,resultados,rg,nivel,columna
+
+//esta solo para 2j
+
+function iniciar2(a)
+{
+ tablero=new   initArray(new initArray(0,0,0,0,0,0,0), //tablero[6][7],tablero[i][j]
+    new initArray(0,0,0,0,0,0,0), //0=vacio,1=jug(azul),2=jug(rojo)
+    new initArray(0,0,0,0,0,0,0),
+    new initArray(0,0,0,0,0,0,0),
+    new initArray(0,0,0,0,0,0,0),
+    new initArray(0,0,0,0,0,0,0))
+
+ jugador=a;
+ mensaje_alerta='El jugador '+(jugador==2?'rojo':'azul')+' empieza el juego'
+ ganador=0;
+ puesta=false;
+ haytablas=false;
+ camcol2();
+ pintar_();
+}
+
+function iniciar(a)
+{
+ tablero=new   initArray(new initArray(0,0,0,0,0,0,0), //tablero[6][7],tablero[i][j]
+    new initArray(0,0,0,0,0,0,0), //0=vacio,1=jug(azul),2=cpu(rojo)
+    new initArray(0,0,0,0,0,0,0),
+    new initArray(0,0,0,0,0,0,0),
+    new initArray(0,0,0,0,0,0,0),
+    new initArray(0,0,0,0,0,0,0))
+
+ jugador=1; // el uno es el jugador, el dos es la cpu
+ mensaje_alerta='Tú comienzas';
+ ganador=0;
+ puesta=false;
+ haytablas=false;
+ if(a==2) camcol();
+ else camcol2();
+
+//para la Ai
+ columna=new initArray(1,1,1,1,1,1,1)
+ nivel=4;
+ resultados=new initArray(0,0,0,0,0,0,0);
+ rg=new initArray(0,0,0,0,0,0,0);
+
+//tp[i][n][j]                             las ies son las filas
+//                                              n=1                            n=2                          n=3                          n=4                          n=5                          n=6
+//                                j=         1,2,3,4,5,6,7
+
+tp=new initArray(new initArray(new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0)),
+   new initArray(new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0)),
+   new initArray(new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0)),
+   new initArray(new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0)),
+   new initArray(new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0)),
+   new initArray(new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0),new initArray(0,0,0,0,0,0,0)));
+
+ pintar();
+}
+
+function initArray()
+{
+ this.length = initArray.arguments.length
+ for (var i = 0; i < this.length; i++)
+ this[i+1] = initArray.arguments[i]
+}
+
+function cambiar(col)
+{
+ for(j=1;j<=7;j++) // cambiar gif por jpg si pongo los dibujos buenos
+ {
+  if(jugador==1) { nombre=tazul; color='#000044' }
+  else if(jugador==2) { nombre=troja; color='#440000' } 
+  if(j==col) eval("document.all.fila"+j+".src=nombre")
+  else eval("document.all.fila"+j+".src=tvacia")
+ }
+}
+
+function pintar()
+{
+ if (!document.all&&!document.getElementById) return;
+ thelement=document.getElementById? document.getElementById("tablero"): document.all.tablero;
+ codigo="<table class=c4><tr>"
+ for(a=1;a<=7;a++) codigo+="<td><img src='tvacia.jpg' id='fila"+a+"'></td>"
+ codigo+="</tr>"
+ for(i=1;i<=6;i++)
+ {
+  codigo+="<tr>"
+  for(j=1;j<=7;j++)
+  {
+   if(tablero[i][j]==0) { nombre=vacio; color='#002288' } 
+   else if(tablero[i][j]==1) { nombre=azul; color='#000044' }
+   else if(tablero[i][j]==2) { nombre=roja; color='#440000' }
+   codigo+="<td onMouseOver='cambiar("+j+")' onClick='echar("+j+")'>"
+   codigo+="<img src="+nombre+"></td>"
+  }
+  codigo+="</tr>"
+ }
+ codigo+="<tr><td colspan=7><center>"+mensaje_alerta+"</td></tr></table>"
+ thelement.innerHTML=codigo
+}
+
+function echar(col)
+{
+ if(ganador) return;
+ puesta=false;
+ if(tablero[1][col])
+ {
+  mensaje_alerta='ahí no puedes, te toca'
+  pintar();
+  return false;
+ }
+ else
+ {
+  for(i=1;i<=5;i++)
+  {
+   if(tablero[i+1][col])
+   {
+    tablero[i][col]=jugador; //mucho cuidado: esta funcion
+    puesta=true;   //sirve para los dos colores
+    break;
+   }
+  }
+  if(!puesta)
+  {
+   tablero[6][col]=jugador;
+   puesta=true;
+  }
+ }
+ ganador=comprobar();
+ cambiarjugador();
+ haytablas=ht();
+ if(haytablas) mensaje_alerta='tablas'+inicia
+ else if(!ganador) mensaje_alerta=(jugador-1?'m':'t')+'e toca a '+(jugador-1?'mí':'ti')
+ else mensaje_alerta='gan'+(ganador-1?'o yo':'as tú')+inicia
+ if(jugador==1) pintar();
+ if(jugador==2) { pintar2(); setTimeout("juegacpu()",20); }
+}
+
+function cambiarjugador()
+{
+ jugador=(3-jugador)
+}
+
+function mirar(f1,c1,f2,c2) //comprueba si en un conjunto lineal
+{    //de cuatro fichas son todas del mismo color.
+ diff=f2-f1
+ difc=c2-c1
+ producto=tablero[f1][c1]*tablero[f1+diff/3][c1+difc/3]
+ producto*=tablero[f2-diff/3][c2-difc/3]*tablero[f2][c2]
+ if(producto==1) ganador=1
+ else if(producto==16) ganador=2
+ return ganador;
+}
+
+function comprobar()
+{
+ for(ly=6,lx=4;ly>2,lx<8;ly-=3,lx+=3)
+  for(i=1;i<=ly;i++)
+   for(j=1;j<=lx;j++)
+    if(mirar(i,j,i+6-ly,j+7-lx))
+    {
+     return ganador;
+    }
+ for(i=4;i<=6;i++)
+  for(j=1;j<=7;j++)
+  {
+   if(j<=4) if(mirar(i,j,i-3,j+3)) return ganador;
+   if(j>=4) if(mirar(i,j,i-3,j-3)) return ganador;
+  }
+}
+
+function ht()
+{
+ var ocs=0;
+ for(j=1;j<=7;j++) if(tablero[1][j]) ocs++;
+ if(ocs==7) return true;
+ else return false;
+}
+
+function camcol()
+{
+ roja="azul.jpg"
+ azul="roja.jpg"
+ troja="tazul.jpg"
+ tazul="troja.jpg"
+}
+
+function camcol2()
+{
+ roja="roja.jpg"
+ azul="azul.jpg"
+ troja="troja.jpg"
+ tazul="tazul.jpg"
+}
+
+//para la Ai las siguientes
+
+function mirar2(f1,c1,f2,c2,n) //comprueba si en un conjunto lineal
+{    //de cuatro fichas son todas del mismo color.
+ diff=f2-f1
+ difc=c2-c1
+ producto=tp[f1][n][c1]*tp[f1+diff/3][n][c1+difc/3];
+ producto*=tp[f2-diff/3][n][c2-difc/3]*tp[f2][n][c2];
+ if(producto==1) return 1;
+ else if(producto==16) return 2;
+}
+
+function comprobar2(n)
+{
+ for(ly=6,lx=4;ly>2,lx<8;ly-=3,lx+=3)
+  for(i=1;i<=ly;i++)
+   for(j=1;j<=lx;j++)
+    if(mirar2(i,j,i+6-ly,j+7-lx,n))
+    {
+     return (mirar2(i,j,i+6-ly,j+7-lx,n));
+    }
+ for(i=4;i<=6;i++)
+  for(j=1;j<=7;j++)
+  {
+   if(j<=4) if(mirar2(i,j,i-3,j+3,n)) return (mirar2(i,j,i-3,j+3,n));
+   if(j>=4) if(mirar2(i,j,i-3,j-3,n)) return (mirar2(i,j,i-3,j-3,n));
+  }
+ return false;
+}
+
+function pintar2()
+{
+ if (!document.all&&!document.getElementById) return;
+ thelement=document.getElementById? document.getElementById("tablero"): document.all.tablero;
+ codigo="<table class=c4><tr>"
+ for(a=1;a<=7;a++) codigo+="<td><img src='tvacia.jpg' id='fila"+a+"'></td>"
+ codigo+="</tr>"
+ for(i=1;i<=6;i++)
+ {
+  codigo+="<tr>"
+  for(j=1;j<=7;j++)
+  {
+   if(tablero[i][j]==0) { nombre=vacio; color='#002288' }
+   else if(tablero[i][j]==1) { nombre=azul; color='#000044' }
+   else if(tablero[i][j]==2) { nombre=roja; color='#440000' }
+   codigo+="<td><img src="+nombre+"></td>"
+  }
+  codigo+="</tr>"
+ }
+ codigo+="<tr><td colspan=7><center>me toca a mí, espera</td></tr></table>"
+ thelement.innerHTML=codigo
+}
+
+function juegacpu()
+{
+ resacero();
+ probar(nivel);
+ decidir();
+ pintar();
+}
+
+function resacero()
+{
+ resultados=new initArray(0,0,0,0,0,0,0);
+ rg=new initArray(0,0,0,0,0,0,0);
+}
+
+function decidir()
+{
+ max=maximo();
+// mostrarresultados();
+ if(!tablero[1][max]) echar(max);
+ else echar(random(7))
+}
+
+function probar(n)
+{
+ if(n==0)
+ {
+  if(comprobar2(1)) agregar(1);
+ }
+ else
+ {
+  for(columna[n]=1;columna[n]<=7;columna[n]++)
+  {
+   igualar2(n);
+   if(echar2(n))
+   {
+    if(!comprobar2(n))
+     probar(n-1);
+    else agregar(n);
+   }
+   else agregar(n);
+  }
+ }
+}
+
+function mostrarresultados()
+{
+ codigo='perder\t\tganar\n=======================\n'
+ codigo+=resultados[1]+'\t'+rg[1]+'\n'
+ codigo+=resultados[2]+'\t'+rg[2]+'\n'
+ codigo+=resultados[3]+'\t'+rg[3]+'\n'
+ codigo+=resultados[4]+'\t'+rg[4]+'\n'
+ codigo+=resultados[5]+'\t'+rg[5]+'\n'
+ codigo+=resultados[6]+'\t'+rg[6]+'\n'
+ codigo+=resultados[7]+'\t'+rg[7]+'\n'
+ confirm(codigo)
+}
+
+function igualar2(n)
+{
+ if(n==0) return false;
+ if(n==nivel)
+ for(i=1;i<=6;i++)
+  for(j=1;j<=7;j++)
+   tp[i][nivel][j]=tablero[i][j]
+ else
+ for(i=1;i<=6;i++)
+  for(j=1;j<=7;j++)
+   tp[i][n][j]=tp[i][n+1][j]
+}
+
+function echar2(n)
+{
+ puesta=false;
+ if(tp[1][n][columna[n]])
+ {
+  return false;
+ }
+ else
+ {
+  for(i=1;i<=5;i++)
+  {
+   if(tp[i+1][n][columna[n]])
+   {
+    tp[i][n][columna[n]]=cualtoca(n);
+    puesta=true;
+    return true;
+   }
+  }
+  if(!puesta)
+  {
+   tp[6][n][columna[n]]=cualtoca(n);
+   return true;
+  }
+ }
+}
+
+function cualtoca(n)
+{
+ return (2-((nivel-n)%2))
+}
+
+function agregar(n)
+{
+ var gan=comprobar2(n)
+ if(gan==1) resultados[columna[nivel]]-=dexp10(n)
+ if(gan==2) rg[columna[nivel]]+=dexp10(n)
+}
+
+function dexp10(n)
+{
+ res=1;
+ for(var l=0;l<(nivel-n);l++) res/=8; //cuanto mas lejano 8 veces menos probable, serian siete?
+ return res;
+}
+
+function mayor(x,m)
+{
+ return((rg[m]>rg[x])?m:x)
+}
+
+function maximo()
+{
+ for(m=4,n=-1,k=0;k<7;k++,n=-1*n,m+=k*n) //primero empieza decidiendo una que se pueda
+  if(!tablero[1][m])
+  {
+   x=m;
+   break;
+  }
+ for(m=4,n=-1,k=0;k<7;k++,n=-1*n,m+=k*n) //4,5,3,6,2,7,1
+ {
+  if((resultados[m]>resultados[x])&&(!tablero[1][m])) x=m
+  else if((resultados[m]==resultados[x])&&(!tablero[1][m]))
+   x=mayor(x,m)
+ }
+ return x;
+}
+
+//estas de aqui abajo son para dos jugadores, se distinguen por el guion bajo (_)
+
+function pintar_()
+{
+ if (!document.all&&!document.getElementById) return;
+ thelement=document.getElementById? document.getElementById("tablero"): document.all.tablero;
+ codigo="<table class=c4><tr>"
+ for(a=1;a<=7;a++) codigo+="<td><img src='tvacia.jpg' id='fila"+a+"'></td>"
+ codigo+="</tr>"
+ for(i=1;i<=6;i++)
+ {
+  codigo+="<tr>"
+  for(j=1;j<=7;j++)
+  {
+   if(tablero[i][j]==0) { nombre=vacio; color='#002288' }
+   else if(tablero[i][j]==1) { nombre=azul; color='#000044' }
+   else if(tablero[i][j]==2) { nombre=roja; color='#440000' }
+   codigo+="<td onMouseOver='cambiar("+j+")' onClick='echar_("+j+")'><img src="+nombre+" id='"+i+","+j+"'></td>"
+  }
+  codigo+="</tr>"
+ }
+ codigo+="<tr><td colspan=7><center>"+mensaje_alerta+"</td></tr></table>"
+ thelement.innerHTML=codigo
+}
+
+function echar_(col)
+{
+ if(ganador) return;
+ puesta=false
+ if(tablero[1][col])
+ {
+  if(!haytablas) mensaje_alerta='ahí no puedes, le toca al jugador '+(jugador-1?'rojo':'azul')
+  pintar_();
+  return 1;
+ }
+ else
+ {
+  for(i=1;i<=5;i++)
+  {
+   if(tablero[i+1][col])
+   {
+    tablero[i][col]=jugador;
+    puesta=true;
+    break;
+   }
+  }
+  if(!puesta)
+  {
+   tablero[6][col]=jugador;
+   puesta=true;
+  }
+ }
+ comprobar();
+ jugador=(3-jugador)
+ haytablas=ht();
+ if(haytablas) mensaje_alerta='tablas'+inicia
+ else if(!ganador) mensaje_alerta='le toca al jugador '+(jugador-1?'rojo':'azul')
+ else mensaje_alerta='el ganador es el jugador '+(ganador-1?'rojo':'azul')+inicia
+ pintar_();
+ return 1;
+}
+
+
+</script></head>
+<body 
+ bgcolor=#000000 text=#00FF00 leftmargin=0 topmargin=0>
+
+
+<center><h1><font color="#CC00CC">Conecta Cuatro</font></h1>
+<span id="tablero" style="cursor:crosshair">
+<table class=c4>
+ <tr>
+ <td>
+  <p><font color="#FF0000">Los 2 jugadores, identificados con los colores rojo y azul,
+  deslizan sus fichas, por turnos, por las columnas
+  del tablero, y éstas caen hasta encontrar otra a su paso. </font>
+  <p><font color="#FF0000">Gana quien consiga colocar cuatro de sus fichas
+  alineadas, vertical, horizontal o diagonalmente. Puedes jugar
+  con alguien que te acompañe o con el ordenador. ¡¡¡Suerte!!! 
+  <br><br></font><center><a href=# onclick="iniciar(2);"><font color="#FF0000">1 jugador</font>
+  <font color="#FF0000">(</font><font color="#FFFFFF">color</font>
+  <font color="#FF0000">rojo)</font></a>
+  <br><center><a href=# onclick="iniciar(1);"><font color="#FF0000">1 jugador</font>
+  <font color="#FF0000">(</font><font color="#FFFFFF">color </font>
+  <font color="#0000FF">azul</font><font color="#FF0000">)</font></a>
+  <br><font color="#FF0000">&nbsp;&nbsp;&nbsp;&nbsp; </font><a href=# onclick="iniciar2(2);">
+  <font color="#FF0000">2 jugadores</font> <font color="#FF0000">(</font><font color="#FFFFFF">empieza</font>
+  <font color="#CC00CC">el </font><font color="#FF0000">rojo)</font></a>
+  <br><font color="#FF0000">&nbsp;&nbsp;&nbsp;&nbsp; </font><a href=# onclick="iniciar2(1);">
+  <font color="#FF0000">2 jugadores</font> <font color="#FF0000">(</font><font color="#FFFFFF">empieza</font>
+  <font color="#CC00CC">el</font> <font color="#0000FF">azul</font><font color="#FF0000">)</font></a><font color="#FF0000">
+  </font>
+  <br><br><img src="roja.jpg" width="39" height="39"><img src="azul.jpg" width="39" height="39"><img src="roja.jpg" width="39" height="39"><img src="azul.jpg" width="39" height="39"><img src="roja.jpg" width="39" height="39"><img src="azul.jpg" width="39" height="39"><img src="roja.jpg" width="39" height="39">
+ </td>
+ </tr>
+</table>
+
