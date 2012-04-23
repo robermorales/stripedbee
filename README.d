@@ -1,0 +1,1 @@
+In 2002, one guy start learning to program in C. A bit later, he met JavaScript and did two experiments.
